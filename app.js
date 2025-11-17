@@ -10,6 +10,12 @@ const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'tr
 // create the Express app
 const app = express();
 
+// test the database connection
+const { sequelize } = require('./models');
+sequelize.authenticate()
+  .then(() => console.log('Connection to the database successful!'))
+  .catch((err) => console.error('Unable to connect to the database:', err));
+
 // setup morgan which gives us http request logging
 app.use(morgan('dev'));
 
