@@ -1,4 +1,4 @@
-// Wraps async route handlers to ctach and forward errors
+// Wraps async route handlers to catch and forward errors
 exports.asyncHandler = (cb) => {
     return async (req, res, next) => {
         try {
