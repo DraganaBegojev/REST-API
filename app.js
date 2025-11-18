@@ -16,8 +16,14 @@ sequelize.authenticate()
   .then(() => console.log('Connection to the database successful!'))
   .catch((err) => console.error('Unable to connect to the database:', err));
 
+// middleware to parse incoming JSON requests
+app.use(express.json());
+
 // setup morgan which gives us http request logging
 app.use(morgan('dev'));
+
+// register API routes
+app.use('/api', require('./routes'));
 
 // setup a friendly greeting for the root route
 app.get('/', (req, res) => {
