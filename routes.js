@@ -2,7 +2,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { User } = require('./models');
+const { User, Course } = require('./models');
 const bcrypt = require('bcryptjs');
 const { authenticateUser } = require('./middleware/auth-user');
 const { asyncHandler } = require('./middleware/async-handler');
@@ -32,3 +32,15 @@ router.post('/users', asyncHandler(async (req, res) => {
 }));
 
 module.exports = router;
+
+// Get /api/courses - Returns a list of courses including the User that owns each course
+router.get('/courses', asyncHandler(async (req, res) => {
+    const courses = await Course.findAll({
+        include: [{
+            model: User
+        }]
+    });
+    res.status(200).json(courses);
+}));
+
+
