@@ -56,8 +56,10 @@ router.post('/users', asyncHandler(async (req, res) => {
 // Get /api/courses - Returns a list of courses including the User that owns each course
 router.get('/courses', asyncHandler(async (req, res) => {
     const courses = await Course.findAll({
+        attibutes: { exlude: ['createdAt', 'updatedAt'] },
         include: [{
-            model: User
+            model: User,
+            attibutes: ['id', 'firstName', 'lastName', 'emailAddress']
         }]
     });
     res.status(200).json(courses);
@@ -66,8 +68,10 @@ router.get('/courses', asyncHandler(async (req, res) => {
 // Get /api/courses/:id - Returns a specific course including the User that owns the course
 router.get('/courses/:id', asyncHandler(async (req, res) => {
     const course = await Course.findByPk(req.params.id, {
+        attibutes: { exlude: ['createdAt', 'updatedAt'] },
         include: [{
-            model: User
+            model: User,
+            attibutes: ['id', 'firstName', 'lastName', 'emailAddress']
         }]
     });
     if (course) {
@@ -87,6 +91,9 @@ router.post('/courses', authenticateUser, asyncHandler(async (req, res) => {
 router.put('/courses/:id', authenticateUser, asyncHandler(async (req, res) => {
     const course = await Course.findByPk(req.params.id);
     if (course) {
+        if (course.userId !== req.currentUser.id) {
+            return res.status(403).json({ message: 'You do not have permission to update this course' });
+        }
         await course.update(req.body);
         res.status(204).end();
     } else {
@@ -98,6 +105,9 @@ router.put('/courses/:id', authenticateUser, asyncHandler(async (req, res) => {
 router.delete('/courses/:id', authenticateUser, asyncHandler(async (req, res) => {
     const course = await Course.findByPk(req.params.id);
     if (course) {
+        if (course.userId !== req.currentUser.id) {
+            return res.status(403).json({ message: 'You do not have permission to delete this course' });
+        }
         await course.destroy();
         res.status(204).end();
     } else {
