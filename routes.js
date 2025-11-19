@@ -63,4 +63,17 @@ router.post('/courses', authenticateUser, asyncHandler(async (req, res) => {
     res.status(201).location(`/api/courses/${course.id}`).end();
 }));
 
+// Update an existing course
+router.put('/courses/:id', authenticateUser, asyncHandler(async (req, res) => {
+    const course = await Course.findByPk(req.params.id);
+
+    if (course) {
+        await course.update(req.body);
+        res.status(204).end();
+    } else {
+        res.status(404).json({ message: 'Course Not Found' });
+    }
+}));
+
+
 
