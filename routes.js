@@ -57,3 +57,10 @@ router.get('/courses/:id', asyncHandler(async (req, res) => {
     }
 }));
 
+// Create a new course
+router.post('/courses', authenticateUser, asyncHandler(async (req, res) => {
+    const course = await Course.create(req.body);
+    res.status(201).location(`/api/courses/${course.id}`).end();
+}));
+
+
