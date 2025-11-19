@@ -5,7 +5,7 @@ exports.asyncHandler = (cb) => {
       await cb(req, res, next);
     } catch (error) {
       // Handle Sequelize validation errors
-      if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
+      if (error.name === 'SequelizeValidationError') {
         const errors = error.errors.map(err => err.message);
         return res.status(400).json({ errors });
       }

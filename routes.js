@@ -22,25 +22,37 @@ router.get('/users', authenticateUser, asyncHandler(async (req, res) => {
 router.post('/users', asyncHandler(async (req, res) => {
     const { firstName, lastName, emailAddress, password } = req.body;
 
-    if (!firstName || !lastName || !emailAddress || !password) {
-        const errors = [];
-        if (!firstName) errors.push('First name is required');
-        if (!lastName) errors.push('Last name is required');
-        if (!emailAddress) errors.push('Email address is required');
-        if (!password) errors.push('Password is required');
+    // Validate required fields
+    const errors = [];
+    if (!firstName) errors.push('First name is required');
+    if (!lastName) errors.push('Last name is required');
+    if (!emailAddress) errors.push('Email address is required');
+    if (!password) errors.push('Password is required');
+
+    if (errors.length > 0) {
         return res.status(400).json({ errors });
     }
 
     const hashedPassword = bcrypt.hashSync(password, 10);
-    const newUser = await User.create({
-        firstName,
-        lastName,
-        emailAddress,
-        password: hashedPassword,
-    });
-    res.status(201).location('/').end();
-}));
 
+    try {
+        const newUser = await User.create({
+            firstName,
+            lastName,
+            emailAddress,
+            password: hashedPassword,
+        });
+        res.status(201).location('/').end();
+    } catch (error) {
+        // Handle unique constraint error
+        if (error.name === 'SequelizeUniqueConstraintError') {
+            const uniqueErrors = error.errors.map(err => err.message);
+            return res.status(400).json({ errors: uniqueErrors });
+        }
+        // Forward other errors to global error handler
+        throw error;
+    }
+}));
 // Get /api/courses - Returns a list of courses including the User that owns each course
 router.get('/courses', asyncHandler(async (req, res) => {
     const courses = await Course.findAll({
