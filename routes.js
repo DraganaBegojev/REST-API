@@ -21,6 +21,16 @@ router.get('/users', authenticateUser, asyncHandler(async (req, res) => {
 // Create a new user
 router.post('/users', asyncHandler(async (req, res) => {
     const { firstName, lastName, emailAddress, password } = req.body;
+
+    if (!firstName || !lastName || !emailAddress || !password) {
+        const errors = [];
+        if (!firstName) errors.push('First name is required');
+        if (!lastName) errors.push('Last name is required');
+        if (!emailAddress) errors.push('Email address is required');
+        if (!password) errors.push('Password is required');
+        return res.status(400).json({ errors });
+    }
+
     const hashedPassword = bcrypt.hashSync(password, 10);
     const newUser = await User.create({
         firstName,
@@ -30,8 +40,6 @@ router.post('/users', asyncHandler(async (req, res) => {
     });
     res.status(201).location('/').end();
 }));
-
-module.exports = router;
 
 // Get /api/courses - Returns a list of courses including the User that owns each course
 router.get('/courses', asyncHandler(async (req, res) => {
@@ -86,4 +94,4 @@ router.delete('/courses/:id', authenticateUser, asyncHandler(async (req, res) =>
 }));
 
 
-
+module.exports = router;

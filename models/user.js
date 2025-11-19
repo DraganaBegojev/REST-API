@@ -50,6 +50,9 @@ module.exports = (sequelize, DataTypes) => {
         msg: 'The email address you entered already exists'
       },
       validate: {
+        notNull: {
+          msg: 'Email address is required'
+        },
         isEmail: {
           msg: 'Please provide a valid email address'
         }
