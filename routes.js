@@ -56,10 +56,10 @@ router.post('/users', asyncHandler(async (req, res) => {
 // Get /api/courses - Returns a list of courses including the User that owns each course
 router.get('/courses', asyncHandler(async (req, res) => {
     const courses = await Course.findAll({
-        attibutes: { exlude: ['createdAt', 'updatedAt'] },
+        attributes: { exclude: ['createdAt', 'updatedAt'] },
         include: [{
             model: User,
-            attibutes: ['id', 'firstName', 'lastName', 'emailAddress']
+            attributes: ['id', 'firstName', 'lastName', 'emailAddress']
         }]
     });
     res.status(200).json(courses);
@@ -68,10 +68,10 @@ router.get('/courses', asyncHandler(async (req, res) => {
 // Get /api/courses/:id - Returns a specific course including the User that owns the course
 router.get('/courses/:id', asyncHandler(async (req, res) => {
     const course = await Course.findByPk(req.params.id, {
-        attibutes: { exlude: ['createdAt', 'updatedAt'] },
+        attributes: { exclude: ['createdAt', 'updatedAt'] },
         include: [{
             model: User,
-            attibutes: ['id', 'firstName', 'lastName', 'emailAddress']
+            attributes: ['id', 'firstName', 'lastName', 'emailAddress']
         }]
     });
     if (course) {
@@ -83,7 +83,14 @@ router.get('/courses/:id', asyncHandler(async (req, res) => {
 
 // Create a new course
 router.post('/courses', authenticateUser, asyncHandler(async (req, res) => {
-    const course = await Course.create(req.body);
+    const user = req.currentUser;
+    const course = await Course.create({
+        title: req.body.title,
+        description: req.body.description,
+        estimatedTime: req.body.estimatedTime,
+        materialsNeeded: req.body.materialsNeeded,
+        userId: user.id
+    });
     res.status(201).location(`/api/courses/${course.id}`).end();
 }));
 
